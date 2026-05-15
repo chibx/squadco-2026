@@ -18,6 +18,23 @@ CREATE TABLE users (
 CREATE INDEX idx_users_email ON users(email);
 CREATE INDEX idx_users_is_business ON users(is_business);
 
+CREATE TABLE business (
+    business_id BIGINT PRIMARY KEY,
+    name TEXT NOT NULL,
+    email TEXT NOT NULL,
+    tin TEXT,
+    nin TEXT NOT NULL UNIQUE,
+    business_type TEXT NOT NULL,
+    rc_number TEXT NOT NULL,
+    address TEXT NOT NULL,
+    status TEXT NOT NULL,
+    vendor_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_business_vendor_id ON business(vendor_id);
+
+
 CREATE TABLE user_sessions (
     user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     refresh_token_hash TEXT NOT NULL PRIMARY KEY,

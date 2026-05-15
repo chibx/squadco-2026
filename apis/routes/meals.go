@@ -362,7 +362,7 @@ func EditReview() fiber.Handler {
 func ListReviews() fiber.Handler {
 	err500 := fiber.NewError(fiber.StatusInternalServerError, "Couldn't load meal reviews")
 	return func(ctx fiber.Ctx) error {
-		mealID := ctx.Params("id")
+		mealID := ctx.Params("meal_id")
 		if mealID == "" {
 			return response.FromFiberError(ctx, fiber.ErrBadRequest)
 		}
@@ -386,7 +386,7 @@ func ListReviews() fiber.Handler {
 			}
 		}
 
-		reviews, err := db.Meals().ListReviews(ctx.Context(), mealIDInt, types.Pagination{Page: uint(page), PageSize: uint(limit)})
+		reviews, err := db.Meals().ListReviews(ctx.Context(), mealIDInt, types.Pagination{Page: page, PageSize: limit})
 		if err != nil {
 			return response.FromFiberError(ctx, err500)
 		}
@@ -414,6 +414,42 @@ func ListReviews() fiber.Handler {
 			Reviews: responseReviews,
 			Total:   len(responseReviews),
 			Page:    page,
+		})
+	}
+}
+
+func SearchMeals() fiber.Handler {
+	err500 := fiber.NewError(fiber.StatusInternalServerError, "Failed to load meals")
+
+	return func(ctx fiber.Ctx) error {
+		search := ctx.Query("search")
+		if search == "" {
+			return response.FromFiberError(ctx, fiber.ErrBadRequest)
+		}
+
+		page := 1
+		limit := 10
+
+		if q := ctx.Query("page", ""); q != "" {
+			if p, err := strconv.Atoi(q); err == nil && p > 0 {
+				page = p
+			}
+		}
+		if q := ctx.Query("limit", ""); q != "" {
+			if l, err := strconv.Atoi(q); err == nil && l > 0 {
+				limit = l
+			}
+		}
+
+		meals, err := db.Meals().SearchMeals(ctx.Context(), search, types.Pagination{Page: page, PageSize: limit})
+		if err != nil {
+			return response.FromFiberError(ctx, err500)
+		}
+
+		return response.WriteResponse(ctx, fiber.StatusOK, "Meal reviews loaded successfully", &response.SearchMealsResponse{
+			Meals: meals,
+			Total: len(meals),
+			Page:  page,
 		})
 	}
 }

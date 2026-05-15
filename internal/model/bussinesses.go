@@ -8,22 +8,6 @@ import (
 
 // ==================== VENDOR CORE ====================
 
-// Vendor represents a business/vendor in the system
-type Business struct {
-	BusinessID   int64     `json:"business_id" gorm:"column:business_id;primaryKey"`
-	Name         string    `json:"name" gorm:"column:name;not null"`
-	Email        string    `json:"email" gorm:"column:email;not null"`
-	Password     string    `json:"password" gorm:"column:password;not null"`
-	TIN          string    `json:"tin" gorm:"column:tin;not null"`
-	NIN          string    `json:"nin" gorm:"column:nin;not null;unique"`
-	BusinessType string    `json:"business_type" gorm:"column:business_type;not null"` // "restaurant", "ecommerce", "food_delivery"
-	RCNumber     string    `json:"rc_number" gorm:"column:rc_number;not null"`         // CAC/RC number
-	Address      string    `json:"address" gorm:"column:address;not null"`
-	Status       string    `json:"status" gorm:"column:status;not null"` // "pending_documents", "documents_received", "payment_pending", "processing", "approved", "restricted", "flagged", "suspended"
-	VendorID     string     `json:"vendor_id" gorm:"column:vendor_id;not null;index"`
-	CreatedAt    time.Time `json:"created_at" gorm:"column:created_at;not null;default:CURRENT_TIMESTAMP"`
-}
-
 type VendorReview struct {
 	ID          int64
 	VendorID    string

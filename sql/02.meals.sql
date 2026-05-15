@@ -10,7 +10,7 @@ CREATE TABLE meals (
     enabled BOOL DEFAULT FALSE,
     category TEXT NOT NULL,
     status TEXT NOT NULL DEFAULT 'active',
-    score DOUBLE PRECISION NOT NULL DEFAULT 0,
+    score DOUBLE PRECISION NOT NULL DEFAULT 50,
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP NOT NULL
 );
