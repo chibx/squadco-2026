@@ -1,6 +1,10 @@
 package response
 
-import "time"
+import (
+	"time"
+
+	"github.com/shopspring/decimal"
+)
 
 // ==================== CUSTOMER AUTH RESPONSES ====================
 
@@ -93,7 +97,7 @@ type OrderListResponse struct {
 
 // MealReviewResponse represents a review
 type MealReviewResponse struct {
-	ReviewID  int64    `json:"review_id"`
+	ReviewID  int64     `json:"review_id"`
 	IsOwner   bool      `json:"is_owner"` // if the review belongs to the current logged in customer
 	CanEdit   bool      `json:"can_edit"` // if the the comment belongs to the logged in customer and the model.Review.Edits is less than or equal to 5
 	Rating    int       `json:"rating"`
@@ -122,9 +126,18 @@ type VendorMenuResponse struct {
 
 // ==================== SEARCH RESPONSES ====================
 
+type SearchMealBody struct {
+	Name         string          `json:"name"`
+	Price        decimal.Decimal `json:"price"`
+	BusinessName string          `json:"vendor_name"`
+	AvgRating    float64         `json:"avg_rating"`
+	TotalReview  int32           `json:"total_reviews"`
+	TotalScore   float64         `json:"-"`
+}
+
 // SearchMealsResponse represents search results for meals
 type SearchMealsResponse struct {
-	Meals []*MealResponse `json:"meals"`
+	Meals []*SearchMealBody `json:"meals"`
 	Total int             `json:"total"`
 	Page  int             `json:"page"`
 }

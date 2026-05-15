@@ -10,7 +10,7 @@ type (
 	mealsRepo    struct{ db *gorm.DB }
 	ordersRepo   struct{ db *gorm.DB }
 	paymentsRepo struct{ db *gorm.DB }
-	pulseRepo    struct{ db *gorm.DB }
+	cloveRepo    struct{ db *gorm.DB }
 )
 
 var (
@@ -18,7 +18,7 @@ var (
 	mealsR    *mealsRepo
 	ordersR   *ordersRepo
 	paymentsR *paymentsRepo
-	pulseR    *pulseRepo
+	cloveR    *cloveRepo
 )
 
 func Users() *usersRepo {
@@ -49,9 +49,9 @@ func Payments() *paymentsRepo {
 	return paymentsR
 }
 
-func VendorPulse() *pulseRepo {
-	if pulseR == nil {
-		pulseR = &pulseRepo{global.DB}
+func Clove() *cloveRepo {
+	if cloveR == nil {
+		cloveR = &cloveRepo{global.DB}
 	}
-	return pulseR
+	return cloveR
 }

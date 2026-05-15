@@ -38,6 +38,8 @@ func MakePayment() fiber.Handler {
 			return response.FromFiberError(ctx, err500)
 		}
 
+		
+
 		return response.WriteResponse(ctx, fiber.StatusCreated, "Order placed successfully")
 	}
 }

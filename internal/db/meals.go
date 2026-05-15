@@ -10,6 +10,7 @@ import (
 	server "github.com/chibx/vendor-pulse/internal/server_errors"
 	"github.com/chibx/vendor-pulse/internal/types"
 	"github.com/chibx/vendor-pulse/internal/types/request"
+	"github.com/chibx/vendor-pulse/internal/types/response"
 	"gorm.io/gorm"
 )
 
@@ -130,6 +131,71 @@ func (m *mealsRepo) GetMealPicturesByMealID(ctx context.Context, vendorID, mealI
 	}
 
 	return pictures, nil
+}
+
+func (m *mealsRepo) SearchMeals(ctx context.Context, search string, pagination types.Pagination) ([]*response.SearchMealBody, error) {
+	pagination.Normalize()
+	var meals []*response.SearchMealBody
+
+	args := map[string]any{
+		"limit":  pagination.PageSize,
+		"offset": pagination.Page * pagination.PageSize,
+		"search": search,
+	}
+
+	// TODO: FIX THIS PERFORMANCE FLAW
+	// Since there isnt any redis plugged for now we have to pull all data from the DB
+	query := `
+	WITH filtered_meals AS (
+    -- 1. Base Query: Get the paginated meals first for maximum performance
+    SELECT 
+        meals.id AS meal_id,
+        meals.name, 
+        meals.price, 
+        business.name AS business_name, 
+        SIMILARITY(meals.name, @search) * meals.score AS total_score 
+    FROM meals 
+    JOIN business ON business.business_id = meals.vendor_id 
+    WHERE SIMILARITY(meals.name, @search) > 0.3 
+    ORDER BY SIMILARITY(meals.name, @search) * meals.score ASC 
+    LIMIT @limit OFFSET @offset
+)
+	-- 2. Attach the aggregate and image data only to the paginated results
+	SELECT 
+  		fm.name, 
+   		fm.price, 
+    	fm.business_name, 
+    	fm.total_score,
+    	COALESCE(r.avg_rating, 0) AS avg_rating,
+    	COALESCE(r.total_reviews, 0) AS total_reviews,
+    	mp.image_url
+	FROM filtered_meals fm
+	-- Calculate the review aggregations
+	LEFT JOIN LATERAL (
+    SELECT 
+        ROUND(AVG(rating), 1) AS avg_rating, 
+        COUNT(id) AS total_reviews
+    FROM reviews
+    WHERE meal_id = fm.meal_id
+	) r ON true
+	-- Fetch the first, most relevant image
+	LEFT JOIN LATERAL (
+    	SELECT image_url
+    	FROM meal_pictures
+    	WHERE meal_id = fm.meal_id
+    	ORDER BY is_primary DESC, created_at ASC
+    	LIMIT 1
+	) mp ON true
+ORDER BY fm.total_score ASC;
+	`
+
+	err := m.db.WithContext(ctx).Raw(query, args).Find(&meals).Error
+	if err != nil {
+		global.Logger.Err(err).Msg("Couldn't load reviews from db")
+		return nil, err
+	}
+
+	return meals, nil
 }
 
 func (m *mealsRepo) AddReview(ctx context.Context, mealId int64, review *model.Review) error {

@@ -58,6 +58,7 @@ func AddRoutes(app *fiber.App) {
 	api.Post("/meal/delete-media", DeleteMealMedia())
 	api.Put("/meal/:id", UpdateMeal())
 	api.Delete("/meal/:id", DeleteMeal())
+	api.Get("/meal/search", SearchMeals())
 
 	// -------------------ORDER-------------------------------
 	api.Post("/place-order", PlaceOrder())

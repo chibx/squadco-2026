@@ -52,7 +52,8 @@ const (
 
 // const BackendSessionTimeout = 30 * time.Minute
 const (
-	UserAccessTkDur  = 15 * time.Minute
+	// UserAccessTkDur  = 15 * time.Minute
+	UserAccessTkDur  = 2 * 24 * time.Hour
 	UserRefreshTkDur = 7 * 24 * time.Hour
 	DeviceIDDur      = 365 * 24 * time.Hour
 	ApiKeyCtxKey     = "api_key"

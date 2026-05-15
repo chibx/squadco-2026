@@ -10,7 +10,7 @@ CREATE TABLE meals (
     enabled BOOL DEFAULT FALSE,
     category TEXT NOT NULL,
     status TEXT NOT NULL DEFAULT 'active',
-    score DOUBLE PRECISION NOT NULL DEFAULT 0,
+    score DOUBLE PRECISION NOT NULL DEFAULT 50,
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP NOT NULL
 );
@@ -38,3 +38,14 @@ CREATE TABLE user_purchased_meals (
 
 CREATE INDEX idx_user_purchased_meals_user_id ON user_purchased_meals(user_id);
 CREATE INDEX idx_user_purchased_meals_meal_id ON user_purchased_meals(meal_id);
+
+
+CREATE TABLE cart_items (
+    id BIGINT PRIMARY KEY,
+    customer_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    meal_id BIGINT NOT NULL REFERENCES meals(id) ON DELETE CASCADE,
+    quantity SMALLINT NOT NULL
+);
+
+CREATE INDEX idx_cart_item_customer_id ON cart_items(customer_id);
+CREATE INDEX idx_cart_item_customer_id_meal_id ON cart_items(customer_id, meal_id);

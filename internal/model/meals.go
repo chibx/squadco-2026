@@ -35,6 +35,13 @@ type MealPicture struct {
 
 // ==================== ORDERS ====================
 
+type CartItem struct {
+	ID         int64 `gorm:"primaryKey"`
+	CustomerID int64
+	MealID     int64
+	Quantity   int16
+}
+
 // Order represents a customer order
 type Order struct {
 	ID              string          `json:"order_id" gorm:"column:id;primaryKey"`
