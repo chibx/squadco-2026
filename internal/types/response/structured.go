@@ -78,7 +78,12 @@ func FromFiberError(ctx fiber.Ctx, err *fiber.Error, data ...any) error {
 	}
 
 	if len(data) > 0 {
-		resp.Data = data[0]
+		// If first data is a ErrorDetail, assume it's errors; else, it's Data
+		if errs, ok := data[0].([]*server.ErrorDetail); ok {
+			resp.Errors = errs
+		} else {
+			resp.Data = data[0]
+		}
 	}
 
 	return ctx.Status(err.Code).JSON(resp)
