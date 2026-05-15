@@ -39,6 +39,16 @@ type DeleteMealPicturesRequest struct {
 
 // ==================== ORDERS ====================
 
+type AddToCartRequest struct {
+	MealID   int64 `json:"meal_id" validate:"required,gte=1"`
+	Quantity int16 `json:"quantity" validate:"required,gte=1"`
+}
+
+type UpdateCartRequest struct {
+	CartItemID int64 `json:"item_id" validate:"required,gte=1"`
+	Quantity   int16 `json:"quantity" validate:"required,gte=0"`
+}
+
 // PlaceOrderRequest represents placing a new order
 type PlaceOrderRequest struct {
 	VendorID        int64        `json:"vendor_id" name:"Vendor ID" validate:"required,gte=1"`
