@@ -18,16 +18,16 @@ type Business struct {
 	NIN          string    `json:"nin" gorm:"column:nin;not null;unique"`
 	BusinessType string    `json:"business_type" gorm:"column:business_type;not null"` // "restaurant", "ecommerce", "food_delivery"
 	RCNumber     string    `json:"rc_number" gorm:"column:rc_number;not null"`         // CAC/RC number
-	State        string    `json:"state" gorm:"column:state;not null"`
 	Address      string    `json:"address" gorm:"column:address;not null"`
 	Status       string    `json:"status" gorm:"column:status;not null"` // "pending_documents", "documents_received", "payment_pending", "processing", "approved", "restricted", "flagged", "suspended"
-	VendorID     int64     `json:"vendor_id" gorm:"column:vendor_id;not null;index"`
+	VendorID     string     `json:"vendor_id" gorm:"column:vendor_id;not null;index"`
 	CreatedAt    time.Time `json:"created_at" gorm:"column:created_at;not null;default:CURRENT_TIMESTAMP"`
 }
 
 type VendorReview struct {
 	ID          int64
 	VendorID    string
+	BusinessID int64
 	Comment     string
 	RatingRatio float64
 	Score       float64
