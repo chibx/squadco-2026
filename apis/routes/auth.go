@@ -191,10 +191,54 @@ func GetUserIdentity() fiber.Handler {
 }
 
 func UpgradeToBusinessAccount() fiber.Handler {
-	// err500 := fiber.NewError(fiber.StatusInternalServerError, "Error occurred while signing you in, please try again")
+	err500 := fiber.NewError(fiber.StatusInternalServerError, "Error occurred while upgrading you to business mode, please try again")
 
 	return func(ctx fiber.Ctx) error {
-		
+		if !ctx.IsMultipart() {
+			return response.WriteResponse(ctx, fiber.StatusBadRequest, "Expect Multipart FormData")
+		}
+		reqBody := &request.UpgradeToBusinessAccountRequest{}
+
+		err := ctx.Bind().Body(reqBody)
+		if err != nil {
+			errorBags := server.ValErrToBag(err)
+			return response.FromFiberError(ctx, fiber.ErrBadRequest, errorBags)
+		}
+
+		customerID := int64(0)
+		if userCtx, ok := ctx.Locals(constants.UserCtxKey).(request.UserCtx); ok {
+			customerID = userCtx.ID
+		}
+		if customerID == 0 {
+			return response.FromFiberError(ctx, fiber.ErrUnauthorized)
+		}
+
+		form, err := ctx.MultipartForm()
+		if err != nil {
+			return response.FromFiberError(ctx, err500)
+		}
+		fileMap, errorBag, err := allFilesExist(form, businessDocs)
+		if err != nil {
+			return response.FromFiberError(ctx, err500)
+		}
+
+		if len(errorBag) > 0 {
+			return response.FromFiberError(ctx, fiber.ErrBadRequest, errorBag)
+		}
+
+		for _, k := range fileMap {
+			if k.Size > constants.MaxImageUpload {
+				return response.WriteResponse(ctx, fiber.StatusBadRequest, "Maximum Upload of 5MB exceeded")
+			}
+		}
+
+		// logo := fileMap["logo"]
+		// face := fileMap["face"]
+		// cacDocument := fileMap["cac_document"]
+		// ninDocument := fileMap["nin_document"]
+
+		db.Clove()
+
 		return nil
 	}
 }
