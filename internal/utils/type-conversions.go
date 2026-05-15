@@ -33,11 +33,11 @@ func UserRegisterToDBBackendUser(c context.Context, req *request.RegisterUserReq
 		return nil, err
 	}
 
-	encryptedPhoneNumber, err := auth.Encrypt(req.Phone, global.SecretKey)
-	if err != nil {
-		logger.Error().Err(err).Msg("Failed to encrypt phone number for new backend user")
-		return nil, err
-	}
+	// encryptedPhoneNumber, err := auth.Encrypt(req.Phone, global.SecretKey)
+	// if err != nil {
+	// 	logger.Error().Err(err).Msg("Failed to encrypt phone number for new backend user")
+	// 	return nil, err
+	// }
 
 	// var countryId uint
 	// if req.Country != nil {
@@ -55,10 +55,11 @@ func UserRegisterToDBBackendUser(c context.Context, req *request.RegisterUserReq
 	// TODO: Implement image upload
 
 	customer := &model.User{
-		FullName:        encryptedFullname,
-		Email:           encryptedEmail,
-		PhoneNumber:     encryptedPhoneNumber,
+		FullName: encryptedFullname,
+		Email:    encryptedEmail,
+		// PhoneNumber:     encryptedPhoneNumber,
 		Password:        passwordHash,
+		Status:          "active",
 		IsEmailVerified: true,
 		// Image:           nil,
 
