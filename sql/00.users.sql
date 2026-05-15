@@ -1,11 +1,12 @@
 -- 00.users.sql
 -- Tables for users and related entities
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
 
 CREATE TABLE users (
     id BIGINT PRIMARY KEY,
     full_name TEXT NOT NULL,
     email TEXT NOT NULL UNIQUE,
-    phone_number TEXT NOT NULL,
+    phone_number TEXT,
     password TEXT NOT NULL,
     status TEXT NOT NULL DEFAULT 'active',
     is_email_verified BOOLEAN NOT NULL DEFAULT FALSE,
